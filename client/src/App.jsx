@@ -1,7 +1,41 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import URLShortenerForm from './components/URLShortenerForm'
+import HistoryPanel from './components/HistoryPanel'
 
 export default function App() {
+  const [history, setHistory] = useState([])
+
+  // Load history from localStorage on mount
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('urlHistory')
+    if (savedHistory) {
+      try {
+        setHistory(JSON.parse(savedHistory))
+      } catch (err) {
+        console.error('Failed to load history:', err)
+      }
+    }
+  }, [])
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('urlHistory', JSON.stringify(history))
+  }, [history])
+
+  const handleURLShortened = (shortUrlData) => {
+    setHistory([shortUrlData, ...history])
+  }
+
+  const handleDeleteHistory = (index) => {
+    setHistory(history.filter((_, i) => i !== index))
+  }
+
+  const handleClearAll = () => {
+    if (confirm('Are you sure you want to clear all history?')) {
+      setHistory([])
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
       {/* Header */}
@@ -13,8 +47,13 @@ export default function App() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 py-12">
-        <URLShortenerForm />
+      <main className="max-w-2xl mx-auto px-4 py-12 space-y-8">
+        <URLShortenerForm onURLShortened={handleURLShortened} />
+        <HistoryPanel 
+          history={history} 
+          onDelete={handleDeleteHistory}
+          onClearAll={handleClearAll}
+        />
       </main>
 
       {/* Footer */}

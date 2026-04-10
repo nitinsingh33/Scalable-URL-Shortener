@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const API_URL = 'http://localhost:3000'
 
-export default function URLShortenerForm() {
+export default function URLShortenerForm({ onURLShortened }) {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -54,6 +54,15 @@ export default function URLShortenerForm() {
       setShortUrl(data.shortUrl)
       setUrl('')
       setSuccess(true)
+      
+      // Notify parent component about the new shortened URL
+      if (onURLShortened) {
+        onURLShortened({
+          originalUrl: url,
+          shortUrl: data.shortUrl,
+          createdAt: new Date().toISOString(),
+        })
+      }
     } catch (err) {
       setError(
         err.message.includes('fetch')
