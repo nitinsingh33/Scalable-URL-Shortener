@@ -87,7 +87,7 @@ export default function URLShortenerForm({ onURLShortened }) {
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com/very/long/url"
+            placeholder="https://example.com/long/url"
             className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={loading}
           />
@@ -120,7 +120,7 @@ export default function URLShortenerForm({ onURLShortened }) {
       {/* Success Message with Result */}
       {success && (
         <div className="mt-6 p-4 bg-green-900/20 border border-green-700/50 rounded-lg">
-          <p className="text-green-300 text-sm font-medium mb-3">✓ URL shortened successfully!</p>
+          <p className="text-green-300 text-sm font-medium mb-3">✓ Your shortened URL</p>
           <div className="bg-slate-700 p-3 rounded-lg flex items-center justify-between">
             <code className="text-blue-300 text-sm break-all">{shortUrl}</code>
             <button
