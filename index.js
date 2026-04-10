@@ -18,15 +18,15 @@ function getRedisClient(key) {
     return redisClient[hash % redisClient.length];
 }
 
-// Endpoint to shorten a URL
+// Endpoint to shorten a URL with expiration
 app.post('/shorten', async (req, res) => {
-    const { url } = req.body;
+    const { url, ttl } = req.body; // ttl (time-to-live) is optional
     if (!url) return res.status(400).send('URL is required');
 
     const shortId = shortid.generate();
     const redisClient = getRedisClient(shortId);
 
-    await redisClient.set(shortId, url);
+    await redisClient.set(shortId, url, 'EX', ttl || 3600); // Default TTL of 1 hour
     res.json({ shortUrl: `http://localhost:${process.env.PORT}/${shortId}` });
 });
 
@@ -37,11 +37,14 @@ app.get('/:shortId', async (req, res) => {
 
     redisClient.get(shortId, (err, url) => {
         if (err || !url) {
+            console.log(`Cache miss for key: ${shortId}`);
             return res.status(404).send('URL not found');      
         }
+        console.log(`Cache hit for key: ${shortId}`);
         res.redirect(url);
     });
 });
+
 
 app.listen(process.env.PORT, () => {
     console.log(`URL Shortener service running on port ${process.env.PORT}`);
